@@ -59,24 +59,47 @@ class ProductController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * @OA\Post(
+     *      path="/api/product",
+     *      operationId="StoreProduct",
+     *      tags={"Product"},
+     *      summary="Store product",
+     *     @OA\RequestBody(
+     *         description="Pet object that needs to be added to the store",
+     *         required=true,
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+ *                      @OA\Property(
+     *                      property="title",
+     *                      description="Email address of the new user.",
+     *                      type="string",
+     *                  ),
+     *                      @OA\Property(
+     *                      property="sa",
+     *                      description="Email address of the new user.",
+     *                      type="string",
+     *                  ),
+     *          )
+     *         ),
+     *     ),
      *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation"
+     *       ),
+     *      @OA\Response(response=400, description="Bad request"),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     *     @OA\Response(response=201, description="Successful created", @OA\JsonContent()),
+     *      security={ {"bearer": {}} },
+     * )
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
-        //
+        return response()->json($request->all(), 200);
     }
 
     /**

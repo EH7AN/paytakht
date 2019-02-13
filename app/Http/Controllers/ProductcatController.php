@@ -39,7 +39,7 @@ class ProductcatController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return response()->json('ok', 200);
     }
 
     /**
