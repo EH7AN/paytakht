@@ -17,7 +17,7 @@ class CreateSlidersTable extends Migration
             $table->increments('id');
             $table->string('title');
             $table->string('link');
-            $table->integer('imgae_media_id');
+            $table->integer('image_media_id');
             $table->integer('logo_media_id');
             $table->enum('type', ['Products','Loot']);
             $table->timestamps();

@@ -8,24 +8,42 @@ use Illuminate\Http\Request;
 class SliderController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Create a new AuthController instance.
      *
-     * @return \Illuminate\Http\Response
+     * @return void
      */
-    public function index()
+    public function __construct()
     {
-        //
+        $this->middleware('auth:api');
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @OA\Get(
+     *      path="/api/slider",
+     *      operationId="getAllSilders",
+     *      tags={"Slider"},
+     *      description="Get all Sliders",
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation"
+     *       ),
+     *      @OA\Response(response=400, description="Bad request"),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     *     @OA\Response(response=201, description="Successful created", @OA\JsonContent()),
+     *      security={ {"bearer": {}} },
+     * )
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function create()
+    public function index()
     {
-        //
+        $sliders = Slider::all();
+        $response = [
+            'sliders' => $sliders,
+            'message' => 'ok'
+        ];
+        return response()->json($response, 200);
     }
+
 
     /**
      * @OA\Post(
@@ -63,51 +81,138 @@ class SliderController extends Controller
      */
     public function store(Request $request)
     {
-        return response()->json($request->all(), 200);
+        $slider = Slider::create( $request->all() );
+        $response = [
+            'sliders' => $slider,
+            'message' => 'ok'
+        ];
+        return response()->json($response, 200);
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\Slider  $silder
-     * @return \Illuminate\Http\Response
+     * @OA\Get(
+     *      path="/api/slider/{sliderId}",
+     *      operationId="getASilder",
+     *      tags={"Slider"},
+     *      description="Get Slider",
+     *     @OA\Parameter(
+     *          name="sliderId",
+     *          description="slider id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation"
+     *       ),
+     *      @OA\Response(response=400, description="Bad request"),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     *     @OA\Response(response=201, description="Successful created", @OA\JsonContent()),
+     *      security={ {"bearer": {}} },
+     * )
+     * @param Slider $slider
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function show(Slider $silder)
+    public function show(Slider $slider)
     {
-        //
+        $response = [
+            'sliders' => $slider,
+            'message' => 'ok'
+        ];
+        return response()->json($response, 200);
+    }
+
+
+    /**
+     * @OA\Put(
+     *      path="/api/slider/{sliderId}",
+     *      operationId="updateSlider",
+     *      tags={"Slider"},
+     *      summary="Store slider",
+     *     @OA\Parameter(
+     *          name="sliderId",
+     *          description="slider id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *     @OA\RequestBody(
+     *         description="Pet object that needs to be added to the store",
+     *         required=true,
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 @OA\Property(property="title",type="string",),
+     *                 @OA\Property(property="link",type="string",),
+     *                 @OA\Property(property="image_media_id",type="integer",),
+     *                 @OA\Property(property="logo_media_id",type="integer",),
+     *                 @OA\Property(property="type",type="string",),
+     *          )
+     *         ),
+     *     ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation"
+     *       ),
+     *      @OA\Response(response=400, description="Bad request"),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     *     @OA\Response(response=201, description="Successful created", @OA\JsonContent()),
+     *      security={ {"bearer": {}} },
+     * )
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(Request $request, Slider $slider)
+    {
+        $data = $slider->update( $request->all() );
+        $response = [
+            'sliders' => $data,
+            'message' => 'ok'
+        ];
+        return response()->json($response, 200);
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Slider  $silder
-     * @return \Illuminate\Http\Response
+     * @OA\Delete(
+     *      path="/api/slider/{sliderId}",
+     *      operationId="DeleteSlider",
+     *      tags={"Slider"},
+     *      description="Delete slider",
+     *     @OA\Parameter(
+     *          name="sliderId",
+     *          description="slider id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation"
+     *       ),
+     *      @OA\Response(response=400, description="Bad request"),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     *     @OA\Response(response=201, description="Successful created", @OA\JsonContent()),
+     *      security={ {"bearer": {}} },
+     * )
+     * @param Slider $slider
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function edit(Slider $silder)
+    public function destroy(Slider $slider)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Slider  $silder
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Slider $silder)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Slider  $silder
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Slider $silder)
-    {
-        //
+        $data = Slider::find($slider->id)->delete();
+        $response = [
+            'sliders' => $data,
+            'message' => 'ok'
+        ];
+        return response()->json($response, 200);
     }
 }

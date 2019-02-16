@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Slider extends Model
 {
     protected $fillable = [
-        'title', 'link', 'imgae_media_id',
+        'title', 'link', 'image_media_id',
         'logo_media_id', 'type'
     ];
 }
