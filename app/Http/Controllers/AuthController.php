@@ -159,7 +159,8 @@ class AuthController extends Controller
     {
         return response()->json([
             'access_token' => 'bearer '.$token,
-            'expires_in' => auth()->factory()->getTTL() * 60
+            'expires_in' => auth()->factory()->getTTL() * 60,
+            'user' => auth()->user()
         ]);
     }
 

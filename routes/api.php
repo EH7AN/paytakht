@@ -33,3 +33,8 @@ Route::group([
 Route::resource('media', 'MediaController');
 // ==================== Product Route
 Route::resource('product', 'ProductController');
+Route::Get('product/{catId}', 'ProductController@getProductByCat');
+// ==================== Product Category Route
+Route::resource('products/category', 'ProductcatController');
+// ==================== Slider route
+Route::resource('slider', 'SliderController');

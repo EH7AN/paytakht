@@ -11,4 +11,11 @@ class Media extends Model
         'name'
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function product()
+    {
+        return $this->hasOne('App\Product');
+    }
 }

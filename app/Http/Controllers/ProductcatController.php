@@ -7,28 +7,42 @@ use Illuminate\Http\Request;
 
 class ProductcatController extends Controller
 {
-
-    public function index(Request $request)
+    /**
+     * Create a new AuthController instance.
+     *
+     * @return void
+     */
+    public function __construct()
     {
-        $request->validate([
-            'category_id' => 'integer|required',
-        ]);
-        $product = Productcat::find($request->category_id)->product;
+        $this->middleware('auth:api');
+    }
+    /**
+     * @OA\Get(
+     *      path="/api/product/category",
+     *      operationId="getAllProductCategory",
+     *      tags={"Product_Category"},
+     *      summary="Get Products Category",
+     *      description="Get all product Category",
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation"
+     *       ),
+     *      @OA\Response(response=400, description="Bad request"),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     *     @OA\Response(response=201, description="Successful created", @OA\JsonContent()),
+     *      security={ {"bearer": {}} },
+     * )
+     * @return \Illuminate\Http\JsonResponse
+     */
+
+    public function index()
+    {
+        $productCategory = Productcat::all();
         $response = [
-            'product' => $product,
+            'categories' => $productCategory,
             'message' => 'ok'
         ];
         return response()->json($response, 200);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -49,17 +63,6 @@ class ProductcatController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show(Productcat $productcat)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Productcat  $productcat
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Productcat $productcat)
     {
         //
     }

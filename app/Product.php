@@ -9,7 +9,7 @@ class Product extends Model
     protected $fillable = [
         'title', 'summary', 'description',
         'media_id', 'code', 'price',
-        'inventory',
+        'inventory','productcat_id'
     ];
 
     /**
@@ -27,5 +27,13 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo('App\Productcat');
+    }
+
+    /**
+     *
+     */
+    public function cover()
+    {
+        $this->belongsTo('App\Media');
     }
 }

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/cassetteshop.iml" filepath="$PROJECT_DIR$/.idea/cassetteshop.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/cassette-shop-server.iml" filepath="$PROJECT_DIR$/.idea/cassette-shop-server.iml" />
     </modules>
   </component>
 </project>

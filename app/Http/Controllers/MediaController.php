@@ -63,7 +63,7 @@ class MediaController extends Controller
         $media->save();
         $media['preview_url'] = URL::to('/storage/medias/'.$media_name);
         $response = [
-            'data' => $media,
+            'media' => $media,
             'msg' => 'ok'
         ];
         return response()->json($response, 200);
@@ -112,6 +112,40 @@ class MediaController extends Controller
         $response->header("Content-Type", $type);
 
         return $response;
+    }
+    /**
+     * @OA\Delete(
+     *      path="/api/media/{mediaId}",
+     *      tags={"Media"},
+     *     @OA\Parameter(
+     *          name="mediaId",
+     *          description="Media id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation"
+     *       ),
+     *      @OA\Response(response=400, description="Bad request"),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     *     @OA\Response(response=201, description="Successful created", @OA\JsonContent()),
+     *      security={ {"bearer": {}} },
+     * )
+     * @param Request $media
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy(Media $medium)
+    {
+        $data = $medium->delete();
+        $response = [
+            'data' => $data,
+            'msg' => 'ok'
+        ];
+        return response()->json($response, 200);
     }
 
 }

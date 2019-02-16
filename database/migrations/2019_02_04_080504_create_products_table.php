@@ -18,7 +18,7 @@ class CreateProductsTable extends Migration
             $table->string('title');
             $table->text('summary');
             $table->text('description');
-            $table->string('media_id');
+            $table->integer('media_id')->unsigned();
             $table->string('code');
             $table->integer('inventory');
             $table->integer('price');
@@ -27,6 +27,7 @@ class CreateProductsTable extends Migration
         });
         Schema::table('products', function($table) {
             $table->foreign('productcat_id')->references('id')->on('productcats');
+            $table->foreign('media_id')->references('id')->on('media');
         });
     }
 
