@@ -18,7 +18,7 @@ class ProductcatController extends Controller
     }
     /**
      * @OA\Get(
-     *      path="/api/product/category",
+     *      path="/api/products/category",
      *      operationId="getAllProductCategory",
      *      tags={"Product_Category"},
      *      summary="Get Products Category",

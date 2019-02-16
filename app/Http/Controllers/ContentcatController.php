@@ -8,13 +8,39 @@ use Illuminate\Http\Request;
 class ContentcatController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Create a new AuthController instance.
      *
-     * @return \Illuminate\Http\Response
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+    /**
+     * @OA\Get(
+     *      path="/api/content/category",
+     *      operationId="getAllContentCategory",
+     *      tags={"Content_Category"},
+     *      description="Get all Content Category",
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation"
+     *       ),
+     *      @OA\Response(response=400, description="Bad request"),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     *     @OA\Response(response=201, description="Successful created", @OA\JsonContent()),
+     *      security={ {"bearer": {}} },
+     * )
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
-        //
+        $data = Contentcat::all();
+        $response = [
+            'categories' => $data,
+            'message' => 'ok'
+        ];
+        return response()->json($response, 200);
     }
 
     /**

@@ -38,3 +38,7 @@ Route::Get('product/{catId}', 'ProductController@getProductByCat');
 Route::resource('products/category', 'ProductcatController');
 // ==================== Slider route
 Route::resource('slider', 'SliderController');
+// ==================== ContentCat route
+Route::resource('content/category', 'ContentcatController');
+// ==================== Content route
+Route::resource('contents', 'ContentController');

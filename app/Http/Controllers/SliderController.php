@@ -119,7 +119,7 @@ class SliderController extends Controller
     public function show(Slider $slider)
     {
         $response = [
-            'sliders' => $slider,
+            'slider' => $slider,
             'message' => 'ok'
         ];
         return response()->json($response, 200);
