@@ -35,7 +35,8 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'signup', 'sendAcCode', 'checkActivationCode']]);
+        $this->middleware('auth:api', ['except' => ['login', 'signup', 'sendAcCode',
+            'checkActivationCode', 'registerUser']]);
     }
     /**
      * @OA\Post(
@@ -358,30 +359,13 @@ class AuthController extends Controller
             if( $ac_code->expiration_time > $current_time ) {
                 $password = rand(5000, 6000);
                 $role_id = Role::where('slug','user')->first()->id;
-                $msg = 'کاربر گرامی کلمه عبور شما(لطفا پس از ورود تعویض نمایید) : '.$password;
                 $user = User::create([
                     'mobile' => $request->number,
                     'password' => $password,
                     'role_id' => $role_id
                 ]);
                 if ( $user ) {
-                    try{
-                        $sender = "100065995";
-                        $message = $msg;
-                        $receptor = [$request->number];
-                        $result = Kavenegar::Send($sender,$receptor,$message);
-                        if($result){
-                            return response()->json($result, 200);
-                        }
-                    }
-                    catch(\Kavenegar\Exceptions\ApiException $e){
-                        // در صورتی که خروجی وب سرویس 200 نباشد این خطا رخ می دهد
-                        return response()->json($e->errorMessage(), 500);
-                    }
-                    catch(\Kavenegar\Exceptions\HttpException $e){
-                        // در زمانی که مشکلی در برقرای ارتباط با وب سرویس وجود داشته باشد این خطا رخ می دهد
-                        return response()->json($e->errorMessage(), 500);
-                    }
+                    return response()->json(['message' => 'verified'], 200);
                 }
             }
             else {
@@ -392,6 +376,60 @@ class AuthController extends Controller
         }
         else {
             return response()->json(['message' => 'کد فعال سازی نا معتبر می باشد.'], 403);
+        }
+    }
+    /**
+     * @OA\Post(
+     *      path="/api/auth/user/register",
+     *      operationId="RegisterUser",
+     *      tags={"Auth"},
+     *      summary="Register new user",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                @OA\Property(property="number",type="integer",),
+     *                @OA\Property(property="name",type="string",),
+     *                @OA\Property(property="family",type="string",),
+     *                @OA\Property(property="email",type="string",),
+     *          )
+     *         ),
+     *     ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation"
+     *       ),
+     *      @OA\Response(response=400, description="Bad request"),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     *     @OA\Response(response=201, description="Successful created", @OA\JsonContent()),
+     *      security={ {"bearer": {}} },
+     * )
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function registerUser(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|max:255',
+            'family' => 'required|max:255',
+            'email' => 'email|unique:users,email',
+            'password'=> 'required'
+        ]);
+        $user = User::where('mobile', $request->number)->first();
+        $user->name = $request->name;
+        $user->family = $request->family;
+        $user->email = $request->email;
+        $user->password = $request->password;
+        $res = $user->save();
+        if ($res) {
+            $credentials = request(['email','password']);
+            if (! $token = auth()->attempt($credentials)) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+
+            return $this->respondWithToken($token);
         }
     }
 
