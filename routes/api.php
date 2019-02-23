@@ -28,6 +28,7 @@ Route::group([
     Route::Get('me', 'AuthController@me');
     Route::Post('activation/send', 'AuthController@sendAcCode');
     Route::Post('activation/check', 'AuthController@checkActivationCode');
+    Route::Post('user/register', 'AuthController@registerUser');
 
 
 });
