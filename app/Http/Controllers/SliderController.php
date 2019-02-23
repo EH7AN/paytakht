@@ -14,7 +14,7 @@ class SliderController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:api', ['except' => ['index']]);
     }
 
     /**
@@ -23,6 +23,15 @@ class SliderController extends Controller
      *      operationId="getAllSilders",
      *      tags={"Slider"},
      *      description="Get all Sliders",
+     *     @OA\Parameter(
+     *          name="type",
+     *          description="slider type",
+     *          required=false,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="string"
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="successful operation"
@@ -32,11 +41,19 @@ class SliderController extends Controller
      *     @OA\Response(response=201, description="Successful created", @OA\JsonContent()),
      *      security={ {"bearer": {}} },
      * )
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-        $sliders = Slider::all();
+        if ( isset($request->type) ) {
+            $sliders = Slider::where('type', $request->type)->orderBy('id', 'DESC')
+                ->take(4)->get();
+        }
+        else {
+            $sliders = Slider::all();
+        }
+
         $response = [
             'sliders' => $sliders,
             'message' => 'ok'

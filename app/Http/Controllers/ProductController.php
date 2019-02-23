@@ -15,24 +15,15 @@ class ProductController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:api', ['except' => ['getProductByCat', 'discountedProduct']]);
     }
     /**
      * @OA\Get(
-     *      path="/api/product/{catId}",
+     *      path="/api/productbycat",
      *      operationId="getProduct",
      *      tags={"Product"},
      *      summary="Get Product By Category",
      *      description="Get product form category",
-     *     @OA\Parameter(
-     *          name="catId",
-     *          description="Product category",
-     *          required=true,
-     *          in="path",
-     *          @OA\Schema(
-     *              type="string"
-     *          )
-     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="successful operation"
@@ -42,17 +33,20 @@ class ProductController extends Controller
      *     @OA\Response(response=201, description="Successful created", @OA\JsonContent()),
      *      security={ {"bearer": {}} },
      * )
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getProductByCat(Request $request)
+    public function getProductByCat()
     {
-        $request->validate([
-            'category_id' => 'integer|required',
-        ]);
-        $product = Productcat::find($request->category_id)->products;
+        $products = [
+            'Album' => Productcat::where('title', 'Album')->first()->products()
+            ->orderBy('id', 'DESC')->take(4)->get()->all(),
+            'MetalPin' => Productcat::where('title', 'MetalPin')->first()->products()
+                ->orderBy('id', 'DESC')->take(4)->get()->all(),
+            'Sticker' => Productcat::where('title', 'Sticker')->first()->products()
+                ->orderBy('id', 'DESC')->take(4)->get()->all(),
+            ];
         $response = [
-            'products' => $product,
+            'products' => $products,
             'message' => 'ok'
         ];
         return response()->json($response, 200);
@@ -80,6 +74,39 @@ class ProductController extends Controller
         $product = Product::orderBy('id', 'DESC')->get();
         $response = [
             'products' => $product,
+            'message' => 'ok'
+        ];
+        return response()->json($response, 200);
+    }
+    /**
+     * @OA\Get(
+     *      path="/api/discounted/products",
+     *      operationId="getAllProduct",
+     *      tags={"Product"},
+     *      summary="Get discounted Products",
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation"
+     *       ),
+     *      @OA\Response(response=400, description="Bad request"),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     *     @OA\Response(response=201, description="Successful created", @OA\JsonContent()),
+     *      security={ {"bearer": {}} },
+     * )
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function discountedProduct()
+    {
+        $products = [
+            'Album' => Productcat::where('title', 'Album')->first()->products()
+                ->has('discount')->with('discount')->orderBy('id', 'DESC')->take(4)->get()->all(),
+            'MetalPin' => Productcat::where('title', 'MetalPin')->first()->products()
+                ->has('discount')->with('discount')->orderBy('id', 'DESC')->take(4)->get()->all(),
+            'Sticker' => Productcat::where('title', 'Sticker')->first()->products()
+                ->has('discount')->with('discount')->orderBy('id', 'DESC')->take(4)->get()->all(),
+        ];
+        $response = [
+            'discounted_products' => $products,
             'message' => 'ok'
         ];
         return response()->json($response, 200);

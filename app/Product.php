@@ -30,10 +30,19 @@ class Product extends Model
     }
 
     /**
-     *
+     * Product Cover photo
      */
     public function cover()
     {
-        $this->belongsTo('App\Media');
+        return $this->belongsTo('App\Media');
+    }
+
+    /**
+     * Product Discount
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function discount()
+    {
+        return $this->hasMany('App\Discount');
     }
 }

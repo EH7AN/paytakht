@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\ActivationCode;
 use App\Role;
 use App\User;
+use Kavenegar;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
@@ -33,7 +35,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'signup']]);
+        $this->middleware('auth:api', ['except' => ['login', 'signup', 'sendAcCode', 'checkActivationCode']]);
     }
     /**
      * @OA\Post(
@@ -240,4 +242,158 @@ class AuthController extends Controller
         $user->save();
         return response()->json(['message' => 'Successfully registered']);
     }
+    /**
+     * @OA\Post(
+     *      path="/api/auth/activation/send",
+     *      operationId="SendSMS",
+     *      tags={"Auth"},
+     *      summary="SEND SMS",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                @OA\Property(property="number",type="integer",),
+     *          )
+     *         ),
+     *     ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation"
+     *       ),
+     *      @OA\Response(response=400, description="Bad request"),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     *     @OA\Response(response=201, description="Successful created", @OA\JsonContent()),
+     *      security={ {"bearer": {}} },
+     * )
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function sendAcCode(Request $request)
+    {
+
+        $expiration_time = strtotime(date("Y-m-d h:i:s")) + 60*60;
+
+        $activation_code = rand(5000,6000);
+        $msg = 'کد فعال سازی :‌'.$activation_code;
+
+        $data = $last_ac_code = ActivationCode::where([
+            'phone_number' => $request->number,
+        ])->first();
+        if( $data ) {
+            $last_ac_code->is_active = 0;
+            $last_ac_code->save();
+        }
+
+        $saved_ac = ActivationCode::create([
+            'phone_number' => $request->number,
+            'activation_code' => $activation_code,
+            'expiration_time' => $expiration_time
+        ]);
+
+        if ($saved_ac) {
+
+            try{
+                $sender = "100065995";
+                $message = $msg;
+                $receptor = [$request->number];
+                $result = Kavenegar::Send($sender,$receptor,$message);
+                if($result){
+                   return response()->json($result, 200);
+                }
+            }
+            catch(\Kavenegar\Exceptions\ApiException $e){
+                // در صورتی که خروجی وب سرویس 200 نباشد این خطا رخ می دهد
+                return response()->json($e->errorMessage(), 500);
+            }
+            catch(\Kavenegar\Exceptions\HttpException $e){
+                // در زمانی که مشکلی در برقرای ارتباط با وب سرویس وجود داشته باشد این خطا رخ می دهد
+                return response()->json($e->errorMessage(), 500);
+            }
+        }
+        else {
+            return response()->json(['message'=>'Error in saving data'], 500);
+        }
+    }
+    /**
+     * @OA\Post(
+     *      path="/api/auth/activation/check",
+     *      operationId="CheckCode",
+     *      tags={"Auth"},
+     *      summary="Check activation code",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                @OA\Property(property="number",type="integer",),
+     *                @OA\Property(property="ac_code",type="integer",),
+     *          )
+     *         ),
+     *     ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation"
+     *       ),
+     *      @OA\Response(response=400, description="Bad request"),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     *     @OA\Response(response=201, description="Successful created", @OA\JsonContent()),
+     *      security={ {"bearer": {}} },
+     * )
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkActivationCode(Request $request)
+    {
+        $current_time = strtotime(date("Y-m-d h:i:s"));
+        $ac_code = ActivationCode::where([
+            'phone_number' => $request->number,
+            'activation_code' => $request->ac_code,
+            'is_active' => 1
+        ])->orderBy('id', 'DESC')->first();
+        if ( $ac_code ) {
+            if( $ac_code->expiration_time > $current_time ) {
+                $password = rand(5000, 6000);
+                $role_id = Role::where('slug','user')->first()->id;
+                $msg = 'کاربر گرامی کلمه عبور شما(لطفا پس از ورود تعویض نمایید) : '.$password;
+                $user = User::create([
+                    'mobile' => $request->number,
+                    'password' => $password,
+                    'role_id' => $role_id
+                ]);
+                if ( $user ) {
+                    try{
+                        $sender = "100065995";
+                        $message = $msg;
+                        $receptor = [$request->number];
+                        $result = Kavenegar::Send($sender,$receptor,$message);
+                        if($result){
+                            return response()->json($result, 200);
+                        }
+                    }
+                    catch(\Kavenegar\Exceptions\ApiException $e){
+                        // در صورتی که خروجی وب سرویس 200 نباشد این خطا رخ می دهد
+                        return response()->json($e->errorMessage(), 500);
+                    }
+                    catch(\Kavenegar\Exceptions\HttpException $e){
+                        // در زمانی که مشکلی در برقرای ارتباط با وب سرویس وجود داشته باشد این خطا رخ می دهد
+                        return response()->json($e->errorMessage(), 500);
+                    }
+                }
+            }
+            else {
+                $ac_code->is_active = 0;
+                $ac_code->save();
+                return response()->json(['message' => 'کد فعال سازی منقضی شده است.'], 403);
+            }
+        }
+        else {
+            return response()->json(['message' => 'کد فعال سازی نا معتبر می باشد.'], 403);
+        }
+    }
+
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Content;
+use App\Contentcat;
 use function GuzzleHttp\Promise\all;
 use Illuminate\Http\Request;
 
@@ -15,7 +16,7 @@ class ContentController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:api', ['except' => ['getContentByCat']]);
     }
 
     /**
@@ -40,6 +41,40 @@ class ContentController extends Controller
         $data = Content::all();
         $response = [
             'contents' => $data,
+            'message' => 'ok'
+        ];
+        return response()->json($response, 200);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/contentbycat",
+     *      operationId="getAllContentsByCat",
+     *      tags={"Contents"},
+     *      description="Get all Contents By cat",
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation"
+     *       ),
+     *      @OA\Response(response=400, description="Bad request"),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     *     @OA\Response(response=201, description="Successful created", @OA\JsonContent()),
+     *      security={ {"bearer": {}} },
+     * )
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getContentByCat()
+    {
+        $contents = [
+            'News' => Contentcat::where('title', 'News')->first()->contents()
+                ->orderBy('id', 'DESC')->take(3)->get()->all(),
+            'Articles' => Contentcat::where('title', 'Articles')->first()->contents()
+                ->orderBy('id', 'DESC')->take(3)->get()->all(),
+            'Posts' => Contentcat::where('title', 'Posts')->first()->contents()
+                ->orderBy('id', 'DESC')->take(3)->get()->all(),
+        ];
+        $response = [
+            'content' => $contents,
             'message' => 'ok'
         ];
         return response()->json($response, 200);

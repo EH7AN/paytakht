@@ -26,6 +26,8 @@ Route::group([
     Route::post('refresh', 'AuthController@refresh');
     Route::post('signup', 'AuthController@signup');
     Route::Get('me', 'AuthController@me');
+    Route::Post('activation/send', 'AuthController@sendAcCode');
+    Route::Post('activation/check', 'AuthController@checkActivationCode');
 
 
 });
@@ -33,7 +35,8 @@ Route::group([
 Route::resource('media', 'MediaController');
 // ==================== Product Route
 Route::resource('product', 'ProductController');
-Route::Get('product/{catId}', 'ProductController@getProductByCat');
+Route::Get('productbycat', 'ProductController@getProductByCat');
+Route::Get('discounted/products', 'ProductController@discountedProduct');
 // ==================== Product Category Route
 Route::resource('products/category', 'ProductcatController');
 // ==================== Slider route
@@ -42,3 +45,6 @@ Route::resource('slider', 'SliderController');
 Route::resource('content/category', 'ContentcatController');
 // ==================== Content route
 Route::resource('contents', 'ContentController');
+Route::Get('contentbycat', 'ContentController@getContentByCat');
+// ==================== Activation code route
+Route::resource('activationcode', 'ActivationCodeController');
