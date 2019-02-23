@@ -66,4 +66,12 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo('App\Role');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function Messages()
+    {
+        return $this->hasMany('App\Message');
+    }
+
 }

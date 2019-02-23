@@ -278,7 +278,6 @@ class AuthController extends Controller
 
         $activation_code = rand(5000,6000);
         $msg = 'کد فعال سازی :‌'.$activation_code;
-
         $data = $last_ac_code = ActivationCode::where([
             'phone_number' => $request->number,
         ])->first();
