@@ -22,6 +22,7 @@ $factory->define(App\User::class, function (Faker $faker) {
         'mobile' =>  $faker->phoneNumber,
         'role_id' => Role::where('slug','user')->first()->id,
         'password' =>  $faker->password,
+        'media_id' =>  rand(1,20),
         'is_active' =>  $faker->boolean,
     ];
 });

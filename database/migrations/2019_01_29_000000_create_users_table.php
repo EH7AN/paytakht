@@ -25,11 +25,13 @@ class CreateUsersTable extends Migration
             $table->text('address')->nullable();
             $table->string('password');
             $table->integer('role_id')->unsigned();
+            $table->integer('media_id')->unsigned()->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
         Schema::table('users', function($table) {
             $table->foreign('role_id')->references('id')->on('roles');
+            $table->foreign('media_id')->references('id')->on('media');
         });
 
     }

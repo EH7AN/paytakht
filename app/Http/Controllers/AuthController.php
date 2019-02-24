@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\ActivationCode;
 use App\Role;
 use App\User;
+use http\Env\Response;
 use Kavenegar;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -292,7 +293,7 @@ class AuthController extends Controller
             'activation_code' => $activation_code,
             'expiration_time' => $expiration_time
         ]);
-       return response()->json($msg, 200);
+       return response()->json(['msg' => $msg ], 200);
 
 //        if ($saved_ac) {
 //
@@ -437,4 +438,85 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *      path="/api/auth/user/profile/update",
+     *      operationId="RegisterUser",
+     *      tags={"Auth"},
+     *      summary="Register new user",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                @OA\Property(property="name",type="string",),
+     *                @OA\Property(property="family",type="string",),
+     *                @OA\Property(property="email",type="string",),
+     *                @OA\Property(property="postal_code",type="string",),
+     *                @OA\Property(property="national_code",type="string",),
+     *                @OA\Property(property="address",type="string",),
+     *          )
+     *         ),
+     *     ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation"
+     *       ),
+     *      @OA\Response(response=400, description="Bad request"),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     *     @OA\Response(response=201, description="Successful created", @OA\JsonContent()),
+     *      security={ {"bearer": {}} },
+     * )
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+        $user->update( $request->all() );
+        $response = [
+            'user' => $user,
+            'message' => 'ok',
+        ];
+        return response()->json($response, 200);
+    }
+    /**
+     * @OA\Post(
+     *      path="/api/auth/user/profile/changepass",
+     *      operationId="ChangeUserPass",
+     *      tags={"Auth"},
+     *      summary="Change User Password",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                @OA\Property(property="password",type="string",),
+     *                @OA\Property(property="password_confirmation",type="string",),
+     *          )
+     *         ),
+     *     ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation"
+     *       ),
+     *      @OA\Response(response=400, description="Bad request"),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     *     @OA\Response(response=201, description="Successful created", @OA\JsonContent()),
+     *      security={ {"bearer": {}} },
+     * )
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'password'=> 'required|confirmed'
+        ]);
+        $user = auth()->user();
+        $user->update( $request->all() );
+        return response()->json(['message' => 'Successfully registered']);
+    }
 }

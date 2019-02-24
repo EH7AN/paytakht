@@ -13,13 +13,12 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        User::truncate();
-
         User::create([
             'name' => 'Maryam',
             'email' => 'admin@cassetteshop.ir',
             'family' => 'Rajabi',
             'mobile' => '09372770491',
+            'media_id' => 1,
             'role_id' => Role::where('slug','admin')->first()->id,
             'password' => 123,
             'is_active' => true,
