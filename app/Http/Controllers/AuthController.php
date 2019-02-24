@@ -292,30 +292,31 @@ class AuthController extends Controller
             'activation_code' => $activation_code,
             'expiration_time' => $expiration_time
         ]);
+       return response()->json($msg, 200);
 
-        if ($saved_ac) {
-
-            try{
-                $sender = "100065995";
-                $message = $msg;
-                $receptor = [$request->number];
-                $result = Kavenegar::Send($sender,$receptor,$message);
-                if($result){
-                   return response()->json($result, 200);
-                }
-            }
-            catch(\Kavenegar\Exceptions\ApiException $e){
-                // در صورتی که خروجی وب سرویس 200 نباشد این خطا رخ می دهد
-                return response()->json($e->errorMessage(), 500);
-            }
-            catch(\Kavenegar\Exceptions\HttpException $e){
-                // در زمانی که مشکلی در برقرای ارتباط با وب سرویس وجود داشته باشد این خطا رخ می دهد
-                return response()->json($e->errorMessage(), 500);
-            }
-        }
-        else {
-            return response()->json(['message'=>'Error in saving data'], 500);
-        }
+//        if ($saved_ac) {
+//
+//            try{
+//                $sender = "100065995";
+//                $message = $msg;
+//                $receptor = [$request->number];
+//                $result = Kavenegar::Send($sender,$receptor,$message);
+//                if($result){
+//                   return response()->json($result, 200);
+//                }
+//            }
+//            catch(\Kavenegar\Exceptions\ApiException $e){
+//                // در صورتی که خروجی وب سرویس 200 نباشد این خطا رخ می دهد
+//                return response()->json($e->errorMessage(), 500);
+//            }
+//            catch(\Kavenegar\Exceptions\HttpException $e){
+//                // در زمانی که مشکلی در برقرای ارتباط با وب سرویس وجود داشته باشد این خطا رخ می دهد
+//                return response()->json($e->errorMessage(), 500);
+//            }
+//        }
+//        else {
+//            return response()->json(['message'=>'Error in saving data'], 500);
+//        }
     }
     /**
      * @OA\Post(
@@ -349,6 +350,9 @@ class AuthController extends Controller
      */
     public function checkActivationCode(Request $request)
     {
+        $request->validate([
+            'number' => 'required|unique:users,mobile',
+        ]);
         $current_time = strtotime(date("Y-m-d h:i:s"));
         $ac_code = ActivationCode::where([
             'phone_number' => $request->number,
