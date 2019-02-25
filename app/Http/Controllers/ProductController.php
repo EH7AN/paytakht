@@ -15,7 +15,7 @@ class ProductController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['getProductByCat', 'discountedProduct']]);
+        $this->middleware('auth:api', ['except' => ['getProductByCat', 'discountedProduct', 'show']]);
     }
 
     /**
