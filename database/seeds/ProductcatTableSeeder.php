@@ -17,12 +17,15 @@ class ProductcatTableSeeder extends Seeder
 
         Productcat::create([
             'title' => 'Album',
+            'nameFa' => 'آلبوم',
         ]);
         Productcat::create([
             'title' => 'MetalPin',
+            'nameFa' => 'پین فلزی',
         ]);
         Productcat::create([
             'title' => 'Sticker',
+            'nameFa' => 'استیکر',
         ]);
     }
 }

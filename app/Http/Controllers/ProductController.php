@@ -17,6 +17,7 @@ class ProductController extends Controller
     {
         $this->middleware('auth:api', ['except' => ['getProductByCat', 'discountedProduct']]);
     }
+
     /**
      * @OA\Get(
      *      path="/api/productbycat",
@@ -24,6 +25,14 @@ class ProductController extends Controller
      *      tags={"Product"},
      *      summary="Get Product By Category",
      *      description="Get product form category",
+     *     @OA\Parameter(
+     *          name="isAll",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="successful operation"
@@ -33,24 +42,39 @@ class ProductController extends Controller
      *     @OA\Response(response=201, description="Successful created", @OA\JsonContent()),
      *      security={ {"bearer": {}} },
      * )
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getProductByCat()
+    public function getProductByCat(Request $request)
     {
-        $products = [
-            'Album' => Productcat::where('title', 'Album')->first()->products()
-            ->orderBy('id', 'DESC')->take(4)->get()->all(),
-            'MetalPin' => Productcat::where('title', 'MetalPin')->first()->products()
-                ->orderBy('id', 'DESC')->take(4)->get()->all(),
-            'Sticker' => Productcat::where('title', 'Sticker')->first()->products()
-                ->orderBy('id', 'DESC')->take(4)->get()->all(),
+        if( $request->isAll ) {
+            $products = [
+                'Album' => Productcat::where('title', 'Album')->first()->products()
+                    ->orderBy('id', 'DESC')->get()->all(),
+                'MetalPin' => Productcat::where('title', 'MetalPin')->first()->products()
+                    ->orderBy('id', 'DESC')->get()->all(),
+                'Sticker' => Productcat::where('title', 'Sticker')->first()->products()
+                    ->orderBy('id', 'DESC')->get()->all(),
             ];
+        }
+        else {
+            $products = [
+                'Album' => Productcat::where('title', 'Album')->first()->products()
+                    ->orderBy('id', 'DESC')->take(4)->get()->all(),
+                'MetalPin' => Productcat::where('title', 'MetalPin')->first()->products()
+                    ->orderBy('id', 'DESC')->take(4)->get()->all(),
+                'Sticker' => Productcat::where('title', 'Sticker')->first()->products()
+                    ->orderBy('id', 'DESC')->take(4)->get()->all(),
+            ];
+        }
+        ;
         $response = [
             'products' => $products,
             'message' => 'ok'
         ];
         return response()->json($response, 200);
     }
+
     /**
      * @OA\Get(
      *      path="/api/product",
@@ -84,6 +108,7 @@ class ProductController extends Controller
      *      operationId="getAllProduct",
      *      tags={"Product"},
      *      summary="Get discounted Products",
+     *
      *      @OA\Response(
      *          response=200,
      *          description="successful operation"
