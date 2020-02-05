@@ -15,7 +15,7 @@ class CreateProductcatsTable extends Migration
     {
         Schema::create('productcats', function (Blueprint $table) {
             $table->increments('id');
-            $table->enum('title', ['Album','MetalPin', 'Sticker']);
+            $table->enum('title', ['Egg']);
             $table->string('nameFa');
             $table->timestamps();
         });

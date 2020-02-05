@@ -16,16 +16,8 @@ class ProductcatTableSeeder extends Seeder
         DB::table('productcats')->delete();
 
         Productcat::create([
-            'title' => 'Album',
-            'nameFa' => 'آلبوم',
-        ]);
-        Productcat::create([
-            'title' => 'MetalPin',
-            'nameFa' => 'پین فلزی',
-        ]);
-        Productcat::create([
-            'title' => 'Sticker',
-            'nameFa' => 'استیکر',
+            'title' => 'Egg',
+            'nameFa' => 'تخم مرغ',
         ]);
     }
 }

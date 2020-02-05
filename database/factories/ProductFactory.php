@@ -11,6 +11,6 @@ $factory->define(App\Product::class, function (Faker $faker) {
         'code' =>  $faker->shuffleString('p-albumseries'),
         'inventory' =>  rand(0,100),
         'price' =>  rand(10000,20000),
-        'productcat_id' =>  rand(1,3),
+        'productcat_id' =>  1,
     ];
 });

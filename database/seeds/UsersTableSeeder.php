@@ -14,10 +14,11 @@ class UsersTableSeeder extends Seeder
     public function run()
     {
         User::create([
-            'name' => 'Maryam',
-            'email' => 'admin@cassetteshop.ir',
-            'family' => 'Rajabi',
-            'mobile' => '09372770491',
+            'name' => 'Ehsan',
+            'username' => 'skyWalk',
+            'email' => 'admin@paytakht.ir',
+            'family' => 'Ghasemi',
+            'mobile' => '09365100755',
             'media_id' => 1,
             'role_id' => Role::where('slug','admin')->first()->id,
             'password' => 123,
